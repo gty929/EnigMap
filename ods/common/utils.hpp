@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "common/cmp_intrinsics.hpp"
 #include "common/defs.hpp"
 #include "common/encutils.hpp"
 #include "common/mov_intrinsics.hpp"

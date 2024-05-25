@@ -1,24 +1,27 @@
-#include "oram/ringoram/oram.hpp"
-#include "oram/pathoram/oram.hpp"
-#include "oram/notoram/oram.hpp"
 #include "otree/otree.hpp"
+
 #include <gtest/gtest.h>
+
 #include <map>
+
+#include "oram/notoram/oram.hpp"
+#include "oram/pathoram/oram.hpp"
+#include "oram/ringoram/oram.hpp"
 using namespace _ORAM;
 using namespace std;
 
-using K = _OBST::K;
+using K = uint64_t;
+//_OBST::K;
 using V = _OBST::V;
 
-#define TTHEADER() \
+#define TTHEADER()                                         \
   using ORAMClient_t = typename TestFixture::ORAMClient_t; \
   using OramClient_t = typename TestFixture::OramClient_t; \
   using OBST = typename TestFixture::OBST;
 
-
 template <typename T>
 class TestOTree : public testing::Test {
-  public:
+ public:
   using ORAMClient_t = typename T::ORAMClient;
   using OramClient_t = typename _OBST::OramClient::OramClient<ORAMClient_t>;
   using OBST = typename _OBST::OBST::OBST<OramClient_t>;
@@ -145,7 +148,6 @@ TYPED_TEST_P(TestOTree, SimplestTest) {
     cout << endl;
   }
 }
-
 
 TYPED_TEST_P(TestOTree, SimplestRot2) {
   TTHEADER();
@@ -386,36 +388,29 @@ TYPED_TEST_P(TestOTree, SimplestRot3_5) {
   t.RecursivePrint();
 }
 
-
-
-template<
-    typename _ORAMClient>
+template <typename _ORAMClient>
 struct TestParameter {
-  using ORAMClient = _ORAMClient; 
+  using ORAMClient = _ORAMClient;
 };
 
-
 typedef ::testing::Types<
-    TestParameter<_ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node,ORAM__Z,false,4> >
-  , TestParameter<_ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node,ORAM__Z,true,4> >
-  , TestParameter<_ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node,false,false> >
-  , TestParameter<_ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node,false,true> >
-  , TestParameter<_ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node,true,false> >
-  , TestParameter<_ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node,true,true> >
-> TestedTypes;
+    TestParameter<_ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node, ORAM__Z,
+                                                          false, 4> >,
+    TestParameter<_ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node, ORAM__Z,
+                                                          true, 4> >,
+    TestParameter<
+        _ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node, false, false> >,
+    TestParameter<
+        _ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node, false, true> >,
+    TestParameter<
+        _ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node, true, false> >,
+    TestParameter<
+        _ORAM::NotORAM::ORAMClient::ORAMClient<_OBST::Node, true, true> > >
+    TestedTypes;
 
-REGISTER_TYPED_TEST_SUITE_P(TestOTree,
-  BasicAssertions,
-  SimpleBalancingRot2,
-  SimpleBalancingRot3,
-  SimplestTest,
-  SimplestRot2,
-  SimplestRot2_2,
-  SimplestBalanced,
-  SimplestRot3,
-  SimplestRot3_2,
-  SimplestRot3_3,
-  SimplestRot3_4,
-  SimplestRot3_5
-);
+REGISTER_TYPED_TEST_SUITE_P(TestOTree, BasicAssertions, SimpleBalancingRot2,
+                            SimpleBalancingRot3, SimplestTest, SimplestRot2,
+                            SimplestRot2_2, SimplestBalanced, SimplestRot3,
+                            SimplestRot3_2, SimplestRot3_3, SimplestRot3_4,
+                            SimplestRot3_5);
 INSTANTIATE_TYPED_TEST_SUITE_P(OTREE, TestOTree, TestedTypes);

@@ -6,7 +6,59 @@
 #include <typeinfo>
 #include <utility>
 
+#include "cmp_intrinsics.hpp"
 #include "cpp_extended.hpp"
+
+template <const size_t size>
+struct Bytes {
+  uint8_t data[size];
+
+  Bytes() = default;
+
+  explicit Bytes(const void* _data) { memcpy(data, _data, size); }
+
+  Bytes(uint64_t val) {
+    static_assert(size >= 8);
+    if constexpr (size != 8) {
+      memset(data, 0, size);
+    }
+    memcpy(data, &val, 8);
+  }
+
+  bool operator==(const Bytes<size>& other) const {
+    return obliCheckEqual<size>(data, other.data);
+  }
+
+  bool operator!=(const Bytes<size>& other) const { return !(*this == other); }
+
+  bool operator<(const Bytes<size>& other) const {
+    return obliCheckLess<size>(data, other.data);
+  }
+
+  bool operator>(const Bytes<size>& other) const { return other < *this; }
+
+  const uint8_t* GetData() const { return data; }
+
+  static consteval inline Bytes DUMMY() {
+    Bytes ret;
+    for (size_t i = 0; i < size; ++i) {
+      ret.data[i] = 0xff;
+    }
+    return ret;
+  }
+
+// out stream
+#ifndef ENCLAVE_MODE
+  friend std::ostream& operator<<(std::ostream& o, const Bytes<size>& x) {
+    for (size_t i = 0; i < size; ++i) {
+      o << std::hex << std::setw(2) << std::setfill('0') << (int)x.data[i]
+        << std::dec;
+    }
+    return o;
+  }
+#endif
+};
+
 INLINE void CSWAP8(const uint64_t cond, uint64_t& guy1, uint64_t& guy2) {
   asm volatile(
       "test %[mcond], %[mcond]\n\t"
@@ -311,6 +363,14 @@ INLINE void CMOV<int8_t>(const uint64_t& cond, int8_t& val1,
   // UNDONE(): Make this a reinterpret cast?
   //
   CMOV1(cond, (uint8_t&)val1, val2);
+}
+
+template <>
+INLINE void CMOV<Bytes<32>>(const uint64_t& cond, Bytes<32>& val1,
+                            const Bytes<32>& val2) {
+  for (uint64_t i = 0; i < 4; ++i) {
+    CMOV(cond, *(uint64_t*)&val1.data[i], *(uint64_t*)&val2.data[i]);
+  }
 }
 
 // Other cmov specializations are inside the respective headers for the types.

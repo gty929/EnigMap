@@ -3,10 +3,10 @@
 #include "oram/pathoram/oram.hpp"
 #include "otree/otree.hpp"
 
-using ORAMClient_t = typename _ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node,ORAM__Z,false,ORAM_SERVER__LEVELS_PER_PACK>;
+using ORAMClient_t = typename _ORAM::PathORAM::ORAMClient::ORAMClient<
+    _OBST::Node, ORAM__Z, false, ORAM_SERVER__LEVELS_PER_PACK>;
 using OramClient_t = typename _OBST::OramClient::OramClient<ORAMClient_t>;
 using OBST_t = typename _OBST::OBST::OBST<OramClient_t>;
-
 
 struct Signal {
   void* client_;
@@ -32,10 +32,10 @@ struct Signal {
     client->Insert(id, v1);
   }
 
-  bool QueryUser(uint64_t id) {  
+  bool QueryUser(uint64_t id) {
     OBST_t* client = static_cast<OBST_t*>(client_);
-    uint64_t v1 = 0;
+    _OBST::V v1 = 0;
     bool contained = client->Get(id, v1);
-    return contained * (v1 == 1);    
+    return contained * (v1 == 1);
   }
 };

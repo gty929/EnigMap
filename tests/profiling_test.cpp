@@ -1,17 +1,21 @@
 #define ENABLE_PROFILING
 
+#include <gtest/gtest.h>
+
+#include <map>
+
 #include "oram/pathoram/oram.hpp"
 #include "oram/ringoram/oram.hpp"
 #include "otree/otree.hpp"
-#include <gtest/gtest.h>
-#include <map>
 using namespace _ORAM;
 using namespace std;
 
-using K = _OBST::K;
+using K = uint64_t;  //_OBST::K;
 using V = _OBST::V;
 
-using ORAMClient_t = typename _ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node,ORAM__Z,false,4>;
+using ORAMClient_t =
+    typename _ORAM::PathORAM::ORAMClient::ORAMClient<_OBST::Node, ORAM__Z,
+                                                     false, 4>;
 using OramClient_t = typename _OBST::OramClient::OramClient<ORAMClient_t>;
 using OBST = typename _OBST::OBST::OBST<OramClient_t>;
 using ORAMServer_t = ORAMClient_t::ORAMClientInterface_t;
@@ -25,9 +29,9 @@ TEST(Profiling, Sanity) {
   TRACER_SET(false);
 
   int sizes[4];
-  const int testcases = sizeof(sizes) / sizeof(int); 
-  for (int i=0; i<testcases; i++) {
-    sizes[i] = (1<<(i+18))-3;
+  const int testcases = sizeof(sizes) / sizeof(int);
+  for (int i = 0; i < testcases; i++) {
+    sizes[i] = (1 << (i + 18)) - 3;
   }
   const int mult = 10;
   for (int iter = 0; iter < testcases; iter++) {
@@ -39,8 +43,7 @@ TEST(Profiling, Sanity) {
     K k;
     V v1, v2;
 
-
-    for (int i = 0; i < std::min(1000, size-1); i++) {
+    for (int i = 0; i < std::min(1000, size - 1); i++) {
       k = (random() % maxK);
       v1 = random();
       t.Insert(k, v1);
@@ -54,7 +57,7 @@ TEST(Profiling, Sanity) {
       t.Get(k, v1);
       if (m.count(k) > 0) {
         v2 = m[k];
-        (void) (v1 == v2);
+        (void)(v1 == v2);
       }
     }
     const clock_t t1 = clock();
